@@ -1,0 +1,135 @@
+<message>
+  <feature>
+		name=label
+		value=PGRMI
+	</feature>
+	<feature>
+		name=yon
+		value=send
+	</feature>
+	<feature>
+		name=fieldcount
+		value=7
+	</feature>
+	
+	<field>
+		<feature>
+			name=label
+			value=Latitude
+		</feature>
+		<feature>
+			name=order
+			value=1
+		</feature>		
+		<feature>
+			name=hint
+			value="Latitude, ddmm.mmm format (leading zeros must be transmitted)"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>
+	<field>
+		<feature>
+			name=label
+			value=LatitudeHemisphere
+		</feature>
+		<feature>
+			name=order
+			value=2
+		</feature>		
+		<feature>
+			name=hint
+			value="Latitude hemisphere, N or S"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>	
+
+	<field>
+		<feature>
+			name=label
+			value=Longitude
+		</feature>
+		<feature>
+			name=order
+			value=3
+		</feature>		
+		<feature>
+			name=hint
+			value="Longitude, dddmm.mmm format (leading zeros must be transmitted)"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>	
+
+	<field>
+		<feature>
+			name=label
+			value=LongitudeHemisphere
+		</feature>
+		<feature>
+			name=order
+			value=4
+		</feature>		
+		<feature>
+			name=hint
+			value="Longitude hemisphere, E or W"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>	
+
+	<field>
+		<feature>
+			name=label
+			value=CurrentUTCDate
+		</feature>
+		<feature>
+			name=order
+			value=5
+		</feature>		
+		<feature>
+			name=hint
+			value="Current UTC date, ddmmyy format"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>	
+	
+	<field>
+		<feature> name=label value=CurrentUTCTime </feature>
+		<feature> name=order value=6  </feature>		
+		<feature> name=hint	 value="Current UTC time, hhmmss format"	</feature>		
+		<feature> name=type	 value=string </feature>		
+    </field>	
+	
+	<field>
+		<feature>
+			name=label
+			value=ReceiverCommand
+		</feature>
+		<feature>
+			name=order
+			value=7
+		</feature>		
+		<feature>
+			name=hint
+			value="Receiver Command, A = Auto Locate, R = Unit Reset"
+		</feature>		
+		<feature>
+			name=type
+			value=string
+		</feature>		
+    </field>	
+	
+</message>
