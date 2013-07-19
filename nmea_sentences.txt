@@ -1,0 +1,479 @@
+Garmin International, Inc.
+1200 E. 151st Street
+Olathe, KS 66062 USA
+190-00684-00, Revision C
+December 2008
+Garmin Proprietary
+NMEA 0183 Sentences
+TECHNICAL
+SPECIFICATIONS
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page ii
+© Copyright 2008 Garmin Ltd. or its subsidiaries
+Garmin International, Inc.
+1200 East 151st Street,
+Olathe, Kansas 66062, USA
+Tel. (913) 397.8200 or (800) 800.1020
+Fax (913) 397.8282
+Garmin (Europe) Ltd.
+Liberty House, Hounsdown Business Park
+Southampton, Hampshire, SO40 9RB UK
+Tel. +44 (0) 870.8501241 (outside the UK)
+0808 2380000 (within the UK)
+Fax +44 (0) 870.8501251
+Garmin Corporation
+No. 68, Jangshu 2nd Road,
+Shijr, Taipei County, Taiwan
+Tel. 886/2.2642.9199
+Fax 886/2.2642.9099
+All rights reserved. Except as expressly provided herein, no part of this manual may be reproduced, copied,
+transmitted, disseminated, downloaded or stored in any storage medium, for any purpose without the
+express prior written consent of Garmin. Garmin hereby grants permission to download a single copy of
+this manual onto a hard drive or other electronic storage medium to be viewed and to print one copy of this
+manual or of any revision hereto, provided that such electronic or printed copy of this manual must contain
+the complete text of this copyright notice and provided further that any unauthorized commercial
+distribution of this manual or any revision hereto is strictly prohibited.
+Information in this document is subject to change without notice. Garmin reserves the right to change or
+improve its products and to make changes in the content without obligation to notify any person or
+organization of such changes or improvements. Visit the Garmin Web site (www.garmin.com) for current
+updates and supplemental information concerning the use and operation of this and other Garmin products.
+Garmin® is a trademark of Garmin Ltd. or its subsidiaries, registered in the USA and other countries.
+Web site address: www.garmin.com
+RECORD OF REVISIONS
+Revision Revision
+Date
+Description ECO #
+A 04/21/06 Initial Release --
+B 04/24/06 Revised and redrawn 37482
+C 12/30/08 Added PGRMW sentence 58677
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page iii
+TABLE OF CONTENTS
+1 Introduction..................................................................................................................1
+1.1 Garmin Proprietary NMEA Sentences ..............................................................................................1
+2 GPS Receiver Software Interface ...............................................................................1
+2.1 Received NMEA 0183 Sentences .....................................................................................................1
+2.1.1 Sensor Initialization Information (PGRMI) ........................................................................................ 1
+2.1.2 Sensor Configuration Information (PGRMC)..................................................................................... 2
+2.1.3 Additional Sensor Configuration Information (PGRMC1) ................................................................. 2
+2.1.4 Output Sentence Enable/Disable (PGRMO) ....................................................................................... 3
+2.1.5 Additional Waypoint Information (PGRMW) .................................................................................... 3
+2.2 Transmitted NMEA 0183 Sentences.................................................................................................4
+2.2.1 Sentence Transmission Rate ............................................................................................................... 4
+2.2.2 Estimated Error Information (PGRME).............................................................................................. 5
+2.2.3 GPS Fix Data Sentence (PGRMF)...................................................................................................... 5
+2.2.4 Aviation Height and VNAV Data (PGRMH) ..................................................................................... 5
+2.2.5 Map Datum (PGRMM)....................................................................................................................... 5
+2.2.6 Sensor Status Information (PGRMT).................................................................................................. 5
+2.2.7 3D velocity Information (PGRMV) .................................................................................................... 6
+2.2.8 Altitude (PGRMZ).............................................................................................................................. 6
+2.2.9 DGPS Beacon Information (PGRMB)............................................................................................... 6
+Appendix A: Earth Datums ......................................................................................................................7
+LIST OF TABLES AND FIGURES
+Table 1: NMEA 0183 Output Sentence Order and Size................................................................................. 4
+Table 2: Characters per Second for Available Baud Rates............................................................................. 4
+
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 1
+1 INTRODUCTION
+1.1 GARMIN PROPRIETARY NMEA SENTENCES
+• Garmin Proprietary NMEA sentences are designed for use with Garmin GPS sensors and GPS
+units in order to interface with external devices for data interpretation and recording. Refer to your
+Garmin Product Owner’s Manual to determine the specific sentences supported by your product.
+• NOTE: Not all Garmin GPS units support NMEA interfaces.
+For those devices that do not support NMEA 0183, refer to the Garmin Device Interface SDK for
+specific information about the Garmin Protocol. The Garmin Device Interface SDK is located on
+the Garmin Web site at http://www.garmin.com/support/ commProtocol.html.
+2 GPS RECEIVER SOFTWARE INTERFACE
+The interface protocol design of most Garmin products is based on the National Marine Electronics
+Association’s NMEA 0183 ASCII interface specification. This standard is fully defined in NMEA 0183,
+Version 2.30. Copies may be obtained from NMEA, http://www.nmea.org/.
+In addition to the standard NMEA 0183 sentences, Garmin GPS receivers may transmit or receive
+information over their serial interface using NMEA 0183 compliant Garmin proprietary sentences. These
+proprietary sentences begin with the characters, “$PGRM”, instead of the characters “$G” that are typical
+of the standard NMEA 0183 sentences. The characters “$P” indicate that the sentence is a proprietary
+implementation and the characters and “GRM” indicate that it is Garmin’s proprietary sentence. The letter
+(or letters) that follow the characters “$PGRM” uniquely identifies that particular Garmin proprietary
+sentence.
+2.1 RECEIVED NMEA 0183 SENTENCES
+The following paragraphs define the sentences that can be received on a GPS unit’s port. Null fields in the
+configuration sentence indicate no change in the particular configuration parameter. All sentences received
+by the GPS unit must be terminated with <CR><LF>, the ASCII characters for carriage return (0D
+hexadecimal) and line feed (0A hexadecimal). The checksum *hh is used for parity checking data and is
+not required, but is recommended for use in environments containing high electromagnetic noise. It is
+generally not required in normal PC environments. When used, the parity bytes (hh) are the ASCII
+representation of the exclusive-or (XOR) sum of all the characters between the “$” and “*” characters, noninclusive.
+Any letters used in the hex representation must be capitalized, such as 3D instead of 3d.
+Sentences may be truncated by <CR><LF> after any data field and valid fields up to that point will be
+acted on by the GPS unit.
+2.1.1 Sensor Initialization Information (PGRMI)
+The $PGRMI sentence provides information used to initialize the GPS sensor’s set position and time used
+for satellite acquisition. Receipt of this sentence by the GPS sensor causes the software to restart the
+satellite acquisition process. If there are no errors in the sentence, it will be echoed upon receipt. If an error
+is detected, the echoed PGRMI sentence contains the current default values. Current PGRMI defaults (with
+the exception of the Receiver Command, which is a command rather than a mode) can also be obtained by
+sending $PGRMIE to the GPS sensor.
+$PGRMI,<1>,<2>,<3>,<4>,<5>,<6>,<7>*hh<CR><LF>
+<1> Latitude, ddmm.mmm format (leading zeros must be transmitted)
+<2> Latitude hemisphere, N or S
+<3> Longitude, dddmm.mmm format (leading zeros must be transmitted)
+<4> Longitude hemisphere, E or W
+<5> Current UTC date, ddmmyy format
+<6> Current UTC time, hhmmss format
+<7> Receiver Command, A = Auto Locate, R = Unit Reset
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 2
+2.1.2 Sensor Configuration Information (PGRMC)
+The $PGRMC sentence provides information used to configure a GPS sensor’s operation. Configuration
+parameters are stored in non-volatile memory and retained between power cycles. The GPS sensor will
+echo this sentence upon its receipt if no errors are detected. If an error is detected, the echoed PGRMC
+sentence contains the current default values. Current default values can also be obtained by sending
+$PGRMCE to the GPS sensor.
+$PGRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>,<13>,<14>*hh<CR><LF>
+<1> Fix mode, A = automatic, 2 = 2D exclusively (host system must supply altitude),
+3 = 3D exclusively
+<2> Altitude above/below mean sea level, -1500.0 to 10000.0 meters
+<3> Earth datum index. If the user datum index (96) is specified, fields <4> through <8> must
+contain valid values. Otherwise, fields <4> through <8> must be null. Refer to your Appendix A
+for a list of earth datums and the corresponding earth datum index.
+<4> User earth datum semi-major axis, 6360000.000 to 6380000.000 meters (.001 meters resolution)
+<5> User earth datum inverse flattening factor, 285.0 to 310.0 (10-9 resolution)
+<6> User earth datum delta x earth centered coordinate, -5000.0 to 5000.0 meters (1 meter resolution)
+<7> User earth datum delta y earth centered coordinate, -5000.0 to 5000.0 meters (1 meter resolution)
+<8> User earth datum delta z earth centered coordinate, -5000.0 to 5000.0 meters (1 meter resolution)
+<9> Differential mode, A = automatic (output DGPS data when available, non-DGPS otherwise), D =
+differential exclusively (output only differential fixes)
+<10> NMEA 0183 Baud rate, 1 = 1200, 2 = 2400, 3 = 4800, 4 = 9600, 5 = 19200, 6 = 300, 7 = 600
+<11> Velocity filter, 0 = No filter, 1 = Automatic filter, 2-255 = Filter time constant (e.g., 10 = 10
+second filter)
+<12> Not used
+<13> Not used
+<14> Dead reckoning valid time 1-30 (sec)
+All configuration changes take effect after receipt of a valid value except baud rate. Baud rate change takes
+effect on the next power cycle or an external reset event.
+2.1.3 Additional Sensor Configuration Information (PGRMC1)
+The $PGRMC1 sentence provides additional information used to configure the GPS sensor operation.
+Configuration parameters are stored in non-volatile memory and retained between power cycles. The GPS
+sensor echos this sentence upon its receipt if no errors are detected. If an error is detected, the echoed
+PGRMC1 sentence contains the current default values. Current default values can also be obtained by
+sending $PGRMC1E to the GPS sensor.
+$PGRMC1,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh<CR><LF>
+<1> NMEA 0183 output time 1-900 (sec)
+<2> Binary Phase Output Data, 1 = Off, 2 = On.
+<3> Automatic Position Averaging when Stopped, 1 = Off, 2 = On
+<4> No Effect (DGPS beacon frequency – 0.0, 283.5 – 325.0 kHz in 0.5 kHz steps)
+<5> No Effect (DGPS beacon bit rate – 0, 25, 50, 100, or 200 bps)
+<6> No Effect (DGPS beacon scanning, 1 = Off, 2 = On)
+<7> NMEA 0183 version 2.30 mode indicator, 1 = Off, 2 = On
+<8> DGPS mode, W = WAAS Only, N = None (DGPS disabled)
+<9> Power Save Mode for GPS, P = Power Save mode, N = Normal
+<10> Adaptive Transmission Enabled, 1 = Off, 2 = On
+<11> Auto Power Off, 1 = Off, 2 = On
+<12> Power On with External Charger, 1 = Off, 2 = On
+Configuration changes take effect immediately, with the exception of Binary Phase Output Data, which
+takes effect on the next power cycle or a reset event. A reset can be commanded by sending the sentence
+“$PGRMI,,,,,,,R” (refer to Section 2.1.1 Sensor Initialization Information (PGRMI)). If the GPS sensor is
+in the Binary data mode, it is necessary to send the following eight-byte data stream to temporarily change
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 3
+the data format to NMEA 0183. Then follow by sending a PGRMC1 sentence that turns off the Binary
+Phase Output Data format:
+10 0A 02 26 00 CE 10 03 (Hexadecimal)
+2.1.4 Output Sentence Enable/Disable (PGRMO)
+The $PGRMO sentence provides the ability to enable and disable specific output sentences.
+$PGRMO,<1>,<2>*hh<CR><LF>
+<1> Target sentence description (e.g., PGRMT, GPGSV, etc.)
+<2> Target sentence mode, where:
+0 = disable specified sentence
+1 = enable specified sentence
+2 = disable all output sentences
+3 = enable all output sentences (except GPALM)
+4 = restore factory default output sentences
+The following notes apply to the PGRMO input sentence:
+1. If the target sentence mode is ‘2’ (disable all), ‘3’ (enable all), or ‘4’ (restore defaults), the target
+sentence description is not checked for validity. In this case, an empty field is allowed (e.g.,
+$PGRMO,,3), or the mode field may contain from 1 to 5 characters.
+2. If the target sentence mode is ‘0’ (disable) or ‘1’ (enable), the target sentence description field must be
+an identifier for one of the sentences that can be output by the GPS sensor.
+3. If either the target sentence mode field or the target sentence description field is not valid, the PGRMO
+sentence will have no effect.
+4. $PGRMO,GPALM,1 causes the GPS sensor to transmit all stored almanac information. All other
+NMEA 0183 sentence transmission will be suspended temporarily.
+5. $PGRMO,,G causes the COM port to change to Garmin Data Transfer format for the duration of the
+power cycle. The Garmin mode is required for GPS 10, GPS 15L, GPS 15H, GPS 16, GPS 17, and
+GPS 18 series product software updates.
+2.1.5 Additional Waypoint Information (PGRMW)
+The $PGRMW sentence provides the ability to update a waypoint’s symbol, altitude, and comment.
+$PGRMW,<1>,<2>,<3>,<4>*hh<CR><LF>
+<1> Waypoint identifier
+<2> Altitude in meters
+<3> Symbol number in Hexadecimal up to FFFF. Uses the enumerated values as defined for
+symbol_type.
+<4> Comment string
+The following notes apply to the PGRMW input sentence:
+1. The waypoint identifier must exactly match an existing waypoint on the unit. If the unit cannot
+find a waypoint that matches the given identifier, the rest of the sentence will be ignored.
+2. See Garmin Device Interface Specification 001-0063-00 for enumerated values of symbol_type.
+3. If the comment string contains more characters than the unit supports, the unit will ignore any
+characters beyond the size allotted for comments.
+4. Not all units support this sentence.
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 4
+2.2 TRANSMITTED NMEA 0183 SENTENCES
+The subsequent paragraphs define the sentences that can be transmitted.
+2.2.1 Sentence Transmission Rate
+Sentences are transmitted with respect to the user selected baud rate.
+The GPS unit transmits each sentence (except where noted in particular transmitted sentence descriptions)
+at a periodic rate based on the user selected baud rate and user selected output sentences. The GPS unit
+transmits the selected sentences contiguously. The length of the transmission can be determined by the
+following equation and Tables 2 and 3:
+total characters to be transmitted
+length of transmission = ---------------------------------------------
+characters transmitted per second
+Sentence Output Rate Maximum Characters
+GPRMC Once per record* 74
+GPGGA Once per record* 82
+GPGSA Once per record* 66
+GPGSV Once per record* 70
+PGRME Once per record* 35
+GPGLL Once per record* 44
+GPVTG Once per record* 42
+PGRMV Once per record* 32
+PGRMF Once per record* 82
+PGRMB Once per record* 40
+PGRMT Once per minute* 50
+*if enabled
+Table 1: NMEA 0183 Output Sentence Order and Size
+Baud Characters per Second
+300 30
+600 60
+1200 120
+2400 240
+4800 480
+9600 960
+19200 1920
+38400 3840
+Table 2: Characters per Second for Available Baud Rates
+The maximum number of fields allowed in a single sentence is 82 characters including delimiters. Values
+in the table include the sentence start delimiter character “$” and the termination delimiter <CR><LF>. The
+factory set defaults result in a once per second transmission at the NMEA 0183 specification transmission
+rate of 4800 baud.
+Some Garmin products implement a one-pulse-per-second output, the rising edge of which is aligned to the
+UTC second boundary to within one microsecond for all conditions in which the receiver has reported a
+valid and accurate position for at least the previous four seconds.
+Regardless of the selected baud rate, the information transmitted by the GPS sensor is referenced to the
+one-pulse-per-second output pulse immediately preceding the GPRMC sentence, or whichever sentence is
+output first in the burst (see Table 2 above). NMEA 0183 sentences are listed in order of their occurrence
+within a record.
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 5
+2.2.2 Estimated Error Information (PGRME)
+$PGRME,<1>,M,<2>,M,<3>,M*hh<CR><LF>
+<1> Estimated horizontal position error (HPE), 0.0 to 999.9 meters
+<2> Estimated vertical position error (VPE), 0.0 to 999.9 meters
+<3> Estimated position error (EPE), 0.0 to 999.9 meters
+2.2.3 GPS Fix Data Sentence (PGRMF)
+$PGRMF,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>,<13>,<14>,<15>*hh<CR><LF>
+<1> GPS week number (0 - 1023)
+<2> GPS seconds (0 - 604799)
+<3> UTC date of position fix, ddmmyy format
+<4> UTC time of position fix, hhmmss format
+<5> GPS leap second count
+<6> Latitude, ddmm.mmmm format (leading zeros will be transmitted)
+<7> Latitude hemisphere, N or S
+<8> Longitude, dddmm.mmmm format (leading zeros will be transmitted)
+<9> Longitude hemisphere, E or W
+<10> Mode, M = manual, A = automatic
+<11> Fix type, 0 = no fix, 1 = 2D fix, 2 = 3D fix
+<12> Speed over ground, 0 to 1051 kilometers/hour
+<13> Course over ground, 0 to 359 degrees, true
+<14> Position dilution of precision, 0 to 9 (rounded to nearest integer value)
+<15> Time dilution of precision, 0 to 9 (rounded to nearest integer value)
+2.2.4 Aviation Height and VNAV Data (PGRMH)
+$PGRMH,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>hh<CR><LF>
+<1> Data status: A = data valid, v = data unusable
+<2> Vertical speed, feet per minute: negative = down, positive = up
+<3> VNAV profile error, feet: -999 ft (below VNAV profile) to 999 ft (above VNAV profile)
+<4> Vertical speed to VNAV target, feet per minute: negative = down, positive = up
+<5> Vertical speed to next waypoint, feet per minute: negative = down, positive = up
+<6> Approximate height above terrain, feet (rounded to next lowest 100 feet)
+<7> Desired track, degrees true
+<8> Course of next route leg after active waypoint, degrees true
+2.2.5 Map Datum (PGRMM)
+$PGRMM,<1> *hh<CR><LF>
+<1> Current map datum (variable length field, for example, “WGS 84”)
+2.2.6 Sensor Status Information (PGRMT)
+The Garmin Proprietary sentence $PGRMT gives information concerning the status of a GPS sensor. This
+sentence is transmitted once per minute regardless of the selected baud rate.
+$PGRMT,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>*hh<CR><LF>
+<1> Product, model and software version (variable length field, e.g., “GPS 10 SW VER 2.01 BT
+VER 1.27 764”)
+<2> ROM checksum test, P = pass, F = fail
+<3> Receiver failure discrete, P = pass, F = fail
+<4> Stored data lost, R = retained, L = lost
+<5> Real time clock lost, R = retained, L = lost
+<6> Oscillator drift discrete, P = pass, F = excessive drift detected
+<7> Data collection discrete, C = collecting, null if not collecting
+<8> GPS sensor temperature in degrees C
+<9> GPS sensor configuration data, R = retained, L = lost
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 6
+2.2.7 3D velocity Information (PGRMV)
+$PGRMV,<1>,<2>,<3>*hh<CR><LF>
+<1> True east velocity, 514.4 to 514.4 meters/second
+<2> True north velocity, 514.4 to 514.4 meters/second
+<3> Up velocity, 999.9 to 9999.9 meters/second
+2.2.8 Altitude (PGRMZ)
+$PGRMZ,<1>, f, <2>,<3>*hh<CR><LF>
+<1> Current altitude, feet
+<2> Fix type: 1 = no fix, 2 = 2D fix, 3 = 3D fix
+2.2.9 DGPS Beacon Information (PGRMB)
+$PGRMB,<1>,<2>,<3>,<4>,<5>,K,<6>,<7>*hh<CR><LF>
+<1> Beacon tune frequency, 0.0, 283.5 – 325.0 kHz in 0.5 kHz steps
+<2> Beacon bit rate, 0, 25, 50, 100, or 200 bps
+<3> Beacon SNR, 0 to 31
+<4> Beacon data quality, 0 to 100
+<5> Distance to beacon reference station in kilometers
+<6> Beacon receiver communication status (0 = Check Wiring, 1 = No Signal, 2 = Tuning, 3 =
+Receiving, 4= Scanning)
+<7> DGPS fix source (R = RTCM, W = WAAS, N = Non-DGPS Fix)
+<8> DGPS mode, A = Automatic, W = WAAS Only, R = RTCM Only, N = None (DGPS disabled)
+Important Note: Garmin units equipped with Sirf® technology chipsets do not support this proprietary
+sentence.
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 7
+APPENDIX A: EARTH DATUMS
+The following is a list of the Garmin GPS 10 Earth datum indices and the corresponding earth datum name
+(including the area of application). NOTE: New datums are always added at the end of the list found on
+your Garmin GPS device.
+0 ADINDAN - Ethiopia, Mali, Senegal, Sudan
+1 AFGOOYE - Somalia
+2 AIN EL ABD 1970 - Bahrain Island, Saudi Arabia
+3 ANNA 1 ASTRO 1965 - Cocos Island
+4 ARC 1950 - Botswana, Lesotho, Malawi, Swaziland, Zaire, Zambia, Zimbabwe
+5 ARC 1960 - Kenya, Tanzania
+6 ASCENSION ISLAND 1958 - Ascension Island
+7 ASTRO BEACON “E” - Iwo Jima Island
+8 AUSTRALIAN GEODETIC 1966 - Australia, Tasmania Island
+9 AUSTRALIAN GEODETIC 1984 - Australia, Tasmania Island
+10 ASTRO DOS 71/4 - St. Helena Island
+11 ASTRONOMIC STATION 1952 - Marcus Island
+12 ASTRO B4 SOROL ATOLL - Tern Island
+13 BELLEVUE (IGN) - Efate and Erromango Islands
+14 BERMUDA 1957 - Bermuda Islands
+15 BOGOTA OBSERVATORY - Colombia
+16 CAMPO INCHAUSPE - Argentina
+17 CANTON ASTRO 1966 - Phoenix Islands
+10 CAPE CANAVERAL - Florida, Bahama Islands
+19 CAPE - South Africa
+20 CARTHAGE - Tunisia
+21 CHATHAM 1971 - Chatham Island (New Zealand)
+22 CHUA ASTRO - Paraguay
+23 CORREGO ALEGRE - Brazil
+24 DJAKARTA (BATAVIA) - Sumatra Island (Indonesia)
+25 DOS 1968 - Gizo Island (New Georgia Islands)
+26 EASTER ISLAND 1967 - Easter Island
+27 EUROPEAN 1950 - Austria, Belgium, Denmark, Finland, France, Germany, Gibraltar, Greece,
+Italy, Luxembourg, Netherlands, Norway, Portugal, Spain, Sweden, Switzerland
+28 EUROPEAN 1979 - Austria, Finland, Netherlands, Norway, Spain, Sweden, Switzerland
+29 FINLAND HAYFORD 1910 - Finland
+30 GANDAJIKA BASE - Republic of Maldives
+31 GEODETIC DATUM 1949 - New Zealand
+32 ORDNANCE SURVEY OF GREAT BRITAIN 1936 - England, Isle of Man, Scotland,
+Shetland Islands, Wales
+33 GUAM 1963 - Guam Island
+34 GUX 1 ASTRO - Guadalcanal Island
+35 HJORSEY 1955 - Iceland
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 8
+36 HONG KONG 1963 - Hong Kong
+37 INDIAN - Bangladesh, India, Nepal
+38 INDIAN - Thailand, Vietnam
+39 IRELAND 1965 - Ireland
+40 ISTS O73 ASTRO 1969 - Diego Garcia
+41 JOHNSTON ISLAND 1961 - Johnston Island
+42 KANDAWALA - Sri Lanka
+43 KERGUELEN ISLAND - Kerguelen Island
+44 KERTAU 1948 - West Malaysia, Singapore
+45 L.C. 5 ASTRO - Cayman Brac Island
+46 LIBERIA 1964 - Liberia
+47 LUZON - Mindanao Island
+48 LUZON - Phillippines (excluding Mindanao Island)
+49 MAHE 1971 - Mahe Island
+50 MARCO ASTRO - Salvage Islands
+51 MASSAWA - Eritrea (Ethiopia)
+52 MERCHICH - Morocco
+53 MIDWAY ASTRO 1961 - Midway Island
+54 MINNA - Nigeria
+55 NORTH AMERICAN 1927 - Alaska
+56 NORTH AMERICAN 1927 - Bahamas (excluding San Salvador Island)
+57 NORTH AMERICAN 1927 - Central America (Belize, Costa Rica, El Salvador, Guatemala,
+Honduras, Nicaragua)
+58 NORTH AMERICAN 1927 - Canal Zone
+59 NORTH AMERICAN 1927 - Canada (including Newfoundland Island)
+60 NORTH AMERICAN 1927 - Caribbean (Barbados, Caicos Islands, Cuba, Dominican
+Republic, Grand Cayman, Jamaica, Leeward Islands, Turks Islands)
+61 NORTH AMERICAN 1927 - Mean Value (CONUS)
+62 NORTH AMERICAN 1927 - Cuba
+63 NORTH AMERICAN 1927 - Greenland (Hayes Peninsula)
+64 NORTH AMERICAN 1927 - Mexico
+65 NORTH AMERICAN 1927 - San Salvador Island
+66 NORTH AMERICAN 1983 - Alaska, Canada, Central America, CONUS, Mexico
+67 NAPARIMA, BWI - Trinidad and Tobago
+68 NAHRWAN - Masirah Island (Oman)
+69 NAHRWAN - Saudi Arabia
+70 NAHRWAN - United Arab Emirates
+71 OBSERVATORIO 1966 - Corvo and Flores Islands (Azores)
+72 OLD EGYPTIAN - Egypt
+73 OLD HAWAIIAN - Mean Value
+74 OMAN - Oman
+190-00684-00 Garmin Proprietary NMEA Sentences Technical Specifications Rev. C
+Page 9
+75 PICO DE LAS NIEVES - Canary Islands
+76 PITCAIRN ASTRO 1967 - Pitcairn Island
+77 PUERTO RICO - Puerto Rico, Virgin Islands
+78 QATAR NATIONAL - Qatar
+79 QORNOQ - South Greenland
+80 REUNION - Mascarene Island
+81 ROME 1940 - Sardinia Island
+82 RT 90 - Sweden
+83 PROVISIONAL SOUTH AMERICAN 1956 - Bolivia, Chile, Colombia, Ecuador, Guyana,
+Peru, Venezuela
+84 SOUTH AMERICAN 1969 - Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador, Guyana,
+Paraguay, Peru, Venezuela, Trinidad and Tobago
+85 SOUTH ASIA - Singapore
+86 PROVISIONAL SOUTH CHILEAN 1963 - South Chile
+87 SANTO (DOS) - Espirito Santo Island
+88 SAO BRAZ - Sao Miguel, Santa Maria Islands (Azores)
+89 SAPPER HILL 1943 - East Falkland Island
+90 SCHWARZECK - Namibia
+91 SOUTHEAST BASE - Porto Santo and Madeira Islands
+92 SOUTHWEST BASE - Faial, Graciosa, Pico, Sao Jorge, and Terceira Islands (Azores)
+93 TIMBALAI 1948 - Brunei and East Malaysia (Sarawak and Sabah)
+94 TOKYO - Japan, Korea, Okinawa
+95 TRISTAN ASTRO 1968 - Tristan da Cunha
+96 User defined earth datum
+97 VITI LEVU 1916 - Viti Levu Island (Fiji Islands)
+98 WAKE-ENIWETOK 1960 - Marshall Islands
+99 WORLD GEODETIC SYSTEM 1972
+100 WORLD GEODETIC SYSTEM 1984
+101 ZANDERIJ - Surinam
+102 CH-1903 - Switzerland
+103 Hu - Tzu - Shan
+104 Indonesia 74
+105 Austria
+106 Potsdam
+107 Taiwan - modified Hu-Tzu-Shan
+108 GDA - Geocentric Datum of Australia
+109 Dutch
+For the latest free software updates (excluding map data) throughout the life of your
+Garmin products, visit the Garmin Web site at www.garmin.com.
+© Copyright 2008 Garmin Ltd. or its subsidiaries
+Garmin International, Inc.
+1200 East 151st Street, Olathe, Kansas 66062, U.S.A.
+Garmin (Europe) Ltd.
+Liberty House, Hounsdown Business Park, Southampton, Hampshire, SO40 9RB UK
+Garmin Corporation
+No. 68, Jangshu 2nd Road, Shijr, Taipei County, Taiwan
+www.garmin.com
+December 2008 Part Number 190-00684-00 Rev. C
